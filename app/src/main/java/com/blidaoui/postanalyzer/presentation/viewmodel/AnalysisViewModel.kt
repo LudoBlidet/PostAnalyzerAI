@@ -19,6 +19,10 @@ data class AnalysisUiState(
     val error: String? = null
 )
 
+data class HistoryUiState(
+    val items: List<AnalysisEntity> = emptyList()
+)
+
 @HiltViewModel
 class AnalysisViewModel @Inject constructor(
     private val repository: AnalysisRepository
@@ -35,7 +39,10 @@ class AnalysisViewModel @Inject constructor(
                 val result = repository.analyzeText(platform, text)
                 _uiState.value = _uiState.value.copy(isLoading = false, result = result, error = null)
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isLoading = false, error = e.message ?: "حدث خطأ أثناء التحليل")
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = e.message ?: "حدث خطأ أثناء التحليل"
+                )
             }
         }
     }
@@ -48,7 +55,10 @@ class AnalysisViewModel @Inject constructor(
                 val result = repository.analyzeImage(platform, description)
                 _uiState.value = _uiState.value.copy(isLoading = false, result = result, error = null)
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isLoading = false, error = e.message ?: "حدث خطأ أثناء تحليل الصورة")
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = e.message ?: "حدث خطأ أثناء تحليل الصورة"
+                )
             }
         }
     }
@@ -61,7 +71,10 @@ class AnalysisViewModel @Inject constructor(
                 val result = repository.analyzeVideo(platform, description)
                 _uiState.value = _uiState.value.copy(isLoading = false, result = result, error = null)
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isLoading = false, error = e.message ?: "حدث خطأ أثناء تحليل الفيديو")
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = e.message ?: "حدث خطأ أثناء تحليل الفيديو"
+                )
             }
         }
     }
@@ -80,13 +93,13 @@ class HistoryViewModel @Inject constructor(
     private val repository: AnalysisRepository
 ) : ViewModel() {
 
-    private val _historyState = MutableStateFlow<List<AnalysisEntity>>(emptyList())
-    val historyState: StateFlow<List<AnalysisEntity>> = _historyState.asStateFlow()
+    private val _historyState = MutableStateFlow(HistoryUiState())
+    val historyState: StateFlow<HistoryUiState> = _historyState.asStateFlow()
 
     init {
         viewModelScope.launch {
             repository.getHistory().collect { items ->
-                _historyState.value = items
+                _historyState.value = HistoryUiState(items = items)
             }
         }
     }

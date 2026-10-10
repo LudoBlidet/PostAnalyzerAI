@@ -1,4 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">محلل المنشورات الذكي</string>
+    <string name="app_subtitle">تطوير: BliDaoui</string>
+    <string name="text_analysis">تحليل نص</string>
+    <string name="image_analysis">تحليل صورة</string>
+    <string name="video_analysis">تحليل فيديو</string>
+    <string name="history">السجل</string>
+    <string name="analyze">تحليل</string>
+    <string name="analyzing">جارٍ التحليل...</string>
+    <string name="share">مشاركة</string>
+    <string name="save">حفظ</string>
+    <string name="new_analysis">تحليل جديد</string>
+    <string name="result">النتيجة</string>
+    <string name="overall_score">التقييم العام</string>
+    <string name="platform">المنصة</string>
+    <string name="expected_performance">التوقع</string>
+    <string name="strengths">نقاط القوة</string>
+    <string name="weaknesses">نقاط الضعف</string>
+    <string name="improvements">اقتراحات التحسين</string>
+    <string name="explanation">التفسير</string>
+    <string name="select_platform">اختر المنصة</string>
+    <string name="enter_text">اكتب المنشور هنا...</string>
+    <string name="select_image">اختيار صورة من المعرض</string>
+    <string name="image_selected">✓ تم اختيار صورة بنجاح</string>
+    <string name="select_video">اختيار فيديو من المعرض</string>
+    <string name="video_selected">✓ تم اختيار فيديو بنجاح</string>
+    <string name="describe_content">اكتب وصف المحتوى</string>
+    <string name="no_history">لا توجد تحليلات سابقة</string>
+    <string name="open">فتح</string>
+    <string name="delete">حذف</string>
+    <string name="cancel">إلغاء</string>
+    <string name="confirm">تأكيد</string>
+    <string name="error_occurred">حدث خطأ أثناء التحليل</string>
+    <string name="error_image">حدث خطأ أثناء تحليل الصورة</string>
+    <string name="error_video">حدث خطأ أثناء تحليل الفيديو</string>
+    <string name="share_result">مشاركة النتيجة</string>
+    <string name="save_result">حفظ النتيجة</string>
+    <string name="result_saved">تم الحفظ بنجاح</string>
 </resources>

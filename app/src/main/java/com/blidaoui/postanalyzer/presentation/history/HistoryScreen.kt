@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.blidaoui.postanalyzer.data.local.AnalysisEntity
@@ -32,21 +33,25 @@ fun HistoryScreen(
     analysisViewModel: AnalysisViewModel,
     historyViewModel: HistoryViewModel
 ) {
-    val history by historyViewModel.historyState.collectAsState()
+    val historyState by historyViewModel.historyState.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text("السجل", style = MaterialTheme.typography.headlineMedium)
+        Text(
+            "السجل",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold
+        )
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (history.isEmpty()) {
+        if (historyState.items.isEmpty()) {
             Text("لا توجد تحليلات سابقة")
         } else {
             LazyColumn {
-                items(history) { item ->
+                items(historyState.items) { item ->
                     HistoryRow(
                         entity = item,
                         onOpen = {
@@ -73,17 +78,17 @@ private fun HistoryRow(
             .padding(vertical = 6.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("التقييم: ${entity.overallScore}/100")
+            Text("التقييم: ${entity.overallScore}/100", fontWeight = FontWeight.SemiBold)
             Text("المنصة: ${entity.platformFocus}")
             Text("التوقع: ${entity.predictedPerformance}")
 
             Spacer(modifier = Modifier.height(12.dp))
             Row {
-                Button(onClick = onOpen) {
+                Button(onClick = onOpen, modifier = Modifier.weight(1f)) {
                     Text("فتح")
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                OutlinedButton(onClick = onDelete) {
+                OutlinedButton(onClick = onDelete, modifier = Modifier.weight(1f)) {
                     Text("حذف")
                 }
             }

@@ -41,8 +41,7 @@ fun ResultScreen(
     var showSaveDialog by remember { mutableStateOf(false) }
 
     if (showShareDialog) {
-        val shareText = buildShareText(result)
-        ShareResultDialog(text = shareText) { showShareDialog = false }
+        ShareResultDialog(result = result) { showShareDialog = false }
     }
 
     if (showSaveDialog) {
@@ -195,25 +194,4 @@ fun ResultScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
-}
-
-private fun buildShareText(result: com.blidaoui.postanalyzer.domain.model.AnalysisResult): String {
-    return """
-📊 نتيجة تحليل المنشور - بواسطة BliDaoui
-
-التقييم العام: ${result.overallScore}/100
-المنصة: ${result.platformFocus}
-التوقع: ${result.predictedPerformance}
-
-✓ نقاط القوة:
-${result.strengths.joinToString("\n") { "• $it" }}
-
-✗ نقاط الضعف:
-${result.weaknesses.joinToString("\n") { "• $it" }}
-
-💡 اقتراحات التحسين:
-${result.improvementSuggestions.joinToString("\n") { "• $it" }}
-
-📝 التفسير: ${result.reasoning}
-    """.trimIndent()
 }
