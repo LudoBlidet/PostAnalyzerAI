@@ -9,6 +9,7 @@ import com.blidaoui.postanalyzer.data.remote.ContentItem
 import com.blidaoui.postanalyzer.data.remote.PartItem
 import com.blidaoui.postanalyzer.domain.model.AnalysisResult
 import com.blidaoui.postanalyzer.domain.model.Platform
+import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.flow.Flow
@@ -21,9 +22,10 @@ class AnalysisRepository @Inject constructor(
     private val analysisDao: AnalysisDao
 ) {
 
-    private val moshi = Moshi.Builder()
+    private val moshi: Moshi = Moshi.Builder()
         .add(KotlinJsonAdapterFactory())
         .build()
+    private val resultAdapter: JsonAdapter<AnalysisResult> = moshi.adapter(AnalysisResult::class.java)
 
     suspend fun analyzeText(platform: Platform, text: String): AnalysisResult {
         return analyze(platform, text)
@@ -37,7 +39,7 @@ class AnalysisRepository @Inject constructor(
         return analyze(platform, videoDescription)
     }
 
-    suspend fun analyze(platform: Platform, content: String): AnalysisResult {
+    private suspend fun analyze(platform: Platform, content: String): AnalysisResult {
         val prompt = buildPrompt(platform, content)
         val response = geminiApiService.generateContent(
             apiKey = BuildConfig.GEMINI_API_KEY,
@@ -61,41 +63,51 @@ class AnalysisRepository @Inject constructor(
         val cleaned = rawJson
             .trim()
             .removePrefix("```json")
+            .removePrefix("```")
             .removeSuffix("```")
             .trim()
 
-        val adapter = moshi.adapter(AnalysisResult::class.java)
-        val result = adapter.fromJson(cleaned)
+        val result = resultAdapter.fromJson(cleaned)
             ?: throw IllegalStateException("فشل في تحليل JSON")
 
-        val entity = result.toEntity()
+        val entity = AnalysisEntity(
+            overallScore = result.overallScore,
+            platformFocus = result.platformFocus,
+            strengths = result.strengths.joinToString("||"),
+            weaknesses = result.weaknesses.joinToString("||"),
+            improvementSuggestions = result.improvementSuggestions.joinToString("||"),
+            predictedPerformance = result.predictedPerformance,
+            reasoning = result.reasoning,
+            timestamp = System.currentTimeMillis()
+        )
+
         analysisDao.insert(entity)
         return result
     }
 
     private fun buildPrompt(platform: Platform, content: String): String {
         return """
-            أنت محلل محتوى تسويقي متخصص في تقييم منشورات وسائل التواصل الاجتماعي.
-            المنصة: ${platform.label}
+أنت محلل محتوى تسويقي متخصص في تقييم منشورات وسائل التواصل الاجتماعي.
+المنصة: ${platform.label}
 
-            المعايير الأساسية:
-            - إذا كانت المنصة TikTok: قوة الخطاف في أول 1-3 ثواني، معدل الإكمال، إعادة المشاهدة، قابلية المشاركة والحفظ.
-            - إذا كانت المنصة Instagram: معدل الإكمال، مشاهدة الفيديو كاملًا، إعادة المشاهدة، المشاركة عبر الرسائل الخاصة (DM)، جودة الخطاف.
-            - إذا كانت المنصة Facebook: التفاعل النوعي، وقت المشاهدة الكلي، ارتباط المحتوى باهتمامات الجمهور.
+المعايير الأساسية:
+- إذا كانت المنصة TikTok: قوة الخطاف في أول 1-3 ثواني، معدل الإكمال، إعادة المشاهدة، قابلية المشاركة والحفظ.
+- إذا كانت المنصة Instagram: معدل الإكمال، مشاهدة الفيديو كاملاً، إعادة المشاهدة، المشاركة عبر الرسائل الخاصة (DM)، جودة الخطاف.
+- إذا كانت المنصة Facebook: التفاعل النوعي، وقت المشاهدة الكلي، ارتباط المحتوى باهتمامات الجمهور.
 
-            المحتوى المراد تقييمه:
-            $content
+المحتوى المراد تقييمه:
+$content
 
-            أعد النتيجة بصيغة JSON فقط وبالهيكل التالي:
-            {
-              "overallScore": 0-100,
-              "platformFocus": "TikTok/Instagram/Facebook",
-              "strengths": ["نقطة قوة 1", "نقطة قوة 2", "نقطة قوة 3"],
-              "weaknesses": ["نقطة ضعف 1", "نقطة ضعف 2", "نقطة ضعف 3"],
-              "improvementSuggestions": ["اقتراح 1", "اقتراح 2", "اقتراح 3", "اقتراح 4", "اقتراح 5"],
-              "predictedPerformance": "عالي/متوسط/منخفض",
-              "reasoning": "شرح مختصر للتقييم"
-            }
+أعد النتيجة بصيغة JSON فقط بدون نص إضافي:
+{
+  "overallScore": 0-100,
+  "platformFocus": "TikTok/Instagram/Facebook",
+  "strengths": ["نقطة قوة 1", "نقطة قوة 2", "نقطة قوة 3"],
+  "weaknesses": ["نقطة ضعف 1", "نقطة ضعف 2", "نقطة ضعف 3"],
+  "improvementSuggestions": ["اقتراح 1", "اقتراح 2", "اقتراح 3", "اقتراح 4", "اقتراح 5"],
+  "predictedPerformance": "عالي/متوسط/منخفض",
+  "reasoning": "شرح مختصر"
+}
         """.trimIndent()
     }
 
@@ -104,15 +116,4 @@ class AnalysisRepository @Inject constructor(
     suspend fun deleteResult(entity: AnalysisEntity) {
         analysisDao.delete(entity)
     }
-
-    fun AnalysisResult.toEntity(): AnalysisEntity = AnalysisEntity(
-        overallScore = overallScore,
-        platformFocus = platformFocus,
-        strengths = strengths.joinToString("||"),
-        weaknesses = weaknesses.joinToString("||"),
-        improvementSuggestions = improvementSuggestions.joinToString("||"),
-        predictedPerformance = predictedPerformance,
-        reasoning = reasoning,
-        timestamp = timestamp
-    )
 }
