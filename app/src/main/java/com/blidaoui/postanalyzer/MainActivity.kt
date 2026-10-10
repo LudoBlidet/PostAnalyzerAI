@@ -17,11 +17,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MaterialTheme(
-                colorScheme = MaterialTheme.colorScheme,
-                typography = MaterialTheme.typography
-            ) {
-                Surface(modifier = Modifier.fillMaxSize()) {
+            MaterialTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
                     AppNavigation()
                 }
             }

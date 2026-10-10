@@ -1,7 +1,8 @@
 package com.blidaoui.postanalyzer.di
 
-import com.blidaoui.postanalyzer.data.local.AnalysisDao
+import android.content.Context
 import com.blidaoui.postanalyzer.data.local.AnalysisDatabase
+import com.blidaoui.postanalyzer.data.local.AnalysisDao
 import com.blidaoui.postanalyzer.data.remote.GeminiApiService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -15,7 +16,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
-import android.content.Context
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -28,6 +28,9 @@ object NetworkModule {
         }
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
+            .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+            .writeTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
             .build()
     }
 

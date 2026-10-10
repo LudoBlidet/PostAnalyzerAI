@@ -52,7 +52,7 @@ fun TextAnalysisScreen(
             .verticalScroll(rememberScrollState())
     ) {
         Text(
-            "تحليل نص",
+            "تحليل النص",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
@@ -103,8 +103,7 @@ fun TextAnalysisScreen(
         if (!uiState.error.isNullOrBlank()) {
             Spacer(modifier = Modifier.height(12.dp))
             Card(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.small
             ) {
                 Text(

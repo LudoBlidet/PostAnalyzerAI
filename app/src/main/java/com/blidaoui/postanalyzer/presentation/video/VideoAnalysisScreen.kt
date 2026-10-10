@@ -63,13 +63,13 @@ fun VideoAnalysisScreen(
             .verticalScroll(rememberScrollState())
     ) {
         Text(
-            "تحليل فيديو",
+            "تحليل الفيديو",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            "اختر فيديو واكتب وصفه",
+            "اختر فيديو واكتب وصف المحتوى",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -81,7 +81,7 @@ fun VideoAnalysisScreen(
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("اختيار فيديو من المعرض")
+            Text("📁 اختيار فيديو من المعرض")
         }
 
         if (pickedUri != null) {
